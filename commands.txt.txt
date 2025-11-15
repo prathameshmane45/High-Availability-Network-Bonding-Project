@@ -1,0 +1,77 @@
+##############################
+# HIGH AVAILABILITY NETWORK USING LINUX BONDING
+# Commands Used in the Project
+##############################
+
+# ----------- Step 1: Check Network Interfaces -----------
+ip a
+
+
+# ----------- Step 2: Assign Temporary IPs (optional for testing) -----------
+sudo ip addr add 192.168.56.101/24 dev enp0s3
+sudo ip link set enp0s3 up
+
+sudo ip addr add 192.168.56.102/24 dev enp0s8
+sudo ip link set enp0s8 up
+
+
+# ----------- Step 3: Load Bonding Kernel Module -----------
+sudo modprobe bonding
+
+# Verify bonding module
+lsmod | grep bonding
+
+# Load bonding module at boot
+echo bonding | sudo tee /etc/modules-load.d/bonding.conf
+
+
+# ----------- Step 4: Create BOND0 Interface (Active–Backup Mode) -----------
+sudo nmcli connection add type bond con-name bond0 ifname bond0 mode active-backup
+
+
+# ----------- Step 5: Assign IP to Bond0 Interface -----------
+sudo nmcli connection modify bond0 ipv4.addresses 192.168.56.150/24
+sudo nmcli connection modify bond0 ipv4.method manual
+sudo nmcli connection up bond0
+
+
+# ----------- Step 6: Add Slave Interfaces to Bond0 -----------
+sudo nmcli connection add type ethernet con-name bond-slave1 ifname enp0s3 master bond0
+sudo nmcli connection add type ethernet con-name bond-slave2 ifname enp0s8 master bond0
+
+sudo nmcli connection modify bond-slave1 ipv4.method disabled
+sudo nmcli connection modify bond-slave2 ipv4.method disabled
+
+sudo nmcli connection up bond-slave1
+sudo nmcli connection up bond-slave2
+
+
+# ----------- Step 7: Verify Bonding Status -----------
+cat /proc/net/bonding/bond0
+
+nmcli device status
+
+
+# ----------- Step 8: Test High Availability (Failover Test) -----------
+# In terminal 1 (ping continuously):
+ping 192.168.56.150
+
+# In terminal 2 (disconnect active NIC):
+sudo nmcli device disconnect enp0s8
+
+# Reconnect NIC:
+sudo nmcli device connect enp0s8
+
+# Try disconnecting other NIC:
+sudo nmcli device disconnect enp0s3
+sudo nmcli device connect enp0s3
+
+
+# ----------- Step 9: Remove Temporary IPs (optional) -----------
+sudo ip addr flush dev enp0s3
+sudo ip addr flush dev enp0s8
+
+##############################
+# END OF COMMANDS
+##############################
+
