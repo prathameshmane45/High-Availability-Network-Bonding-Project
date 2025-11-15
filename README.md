@@ -1,5 +1,21 @@
 📝 Introduction
 
+This project implements a High Availability (HA) network setup using Linux NIC bonding in active-backup mode. Two physical network interfaces (enp0s3 and enp0s8) are combined into a single logical interface (bond0). If the active NIC fails, network traffic automatically switches to the backup NIC without interruption. This setup ensures continuous connectivity, providing reliability, redundancy, and fault tolerance for critical systems.
+
+🎯 Objectives
+
+To configure high availability networking using NIC bonding in CentOS 9
+
+To ensure zero network downtime during NIC failure
+
+To combine two NICs into one logical bonded interface (bond0)
+
+To test and verify automatic failover between NICs
+
+To demonstrate a practical Linux system administration HA setup
+
+📝 Introduction
+
 
 
 This project implements a High Availability (HA) network setup using Linux NIC bonding in active-backup mode. Two physical network interfaces (enp0s3 and enp0s8) are combined into a single logical interface (bond0). If the active NIC fails, network traffic automatically switches to the backup NIC without interruption. This setup ensures continuous connectivity, providing reliability, redundancy, and fault tolerance for critical systems.
